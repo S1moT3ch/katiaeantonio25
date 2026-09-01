@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Heart,
@@ -7,7 +7,9 @@ import {
   RotateCcw,
   ChevronUp,
   ChevronDown,
-  Phone
+  Phone,
+  ZoomIn,
+  ZoomOut
 } from 'lucide-react';
 import EmbossedFloralHeart from './EmbossedFloralHeart';
 import Countdown from './Countdown';
@@ -20,6 +22,7 @@ export default function BrochureInvitation() {
   //       2 = Passo 2 (Apertura verso il basso: Trittico completo con Cerimonia e Ricevimento)
   const [step, setStep] = useState(0);
   const [isRsvpOpen, setIsRsvpOpen] = useState(false);
+  const [isZoomedIn, setIsZoomedIn] = useState(false);
 
   const { couple, event, quote } = invitationData;
 
@@ -41,7 +44,52 @@ export default function BrochureInvitation() {
 
   const handleCloseAll = () => {
     setStep(0);
+    setIsZoomedIn(false);
   };
+
+  const toggleZoom = () => {
+    setIsZoomedIn(!isZoomedIn);
+  };
+
+  const cardRef = useRef(null);
+  const [autoScaleFactor, setAutoScaleFactor] = useState(1);
+
+  // Effetto cinematografico: Zoom-out dinamico per far entrare tutto nello schermo
+  useEffect(() => {
+    const updateScale = () => {
+      if (!cardRef.current) return;
+      
+      // Altezza base del quadrato centrale (es. max 430px)
+      const baseHeight = cardRef.current.offsetHeight;
+      if (baseHeight === 0) return;
+
+      // Calcoliamo l'altezza totale stimata in base allo step
+      // Aggiungiamo un 10% di margine per respiro (1.1, 3.3)
+      // Se lo step è >= 1 facciamo zoom-out calcolando lo spazio per tutte e 3 le pagine fin da subito
+      let requiredHeight = baseHeight * 1.1; 
+      if (step >= 1) {
+        requiredHeight = baseHeight * 3.3;
+      }
+
+      const availableHeight = window.innerHeight;
+
+      if (requiredHeight > availableHeight) {
+        setAutoScaleFactor(availableHeight / requiredHeight);
+      } else {
+        setAutoScaleFactor(1);
+      }
+    };
+
+    updateScale();
+    // Piccolo ritardo per assicurare il rendering del DOM
+    const timeout = setTimeout(updateScale, 50);
+
+    window.addEventListener('resize', updateScale);
+    return () => {
+      window.removeEventListener('resize', updateScale);
+      clearTimeout(timeout);
+    };
+  }, [step]);
 
   // Transizione morbida e realistica
   const flapTransition = {
@@ -50,34 +98,21 @@ export default function BrochureInvitation() {
   };
 
   return (
-    <div className="brochure-page-container">
+    <div className={`brochure-page-container ${isZoomedIn ? 'is-zoomed-in' : ''}`}>
       <div className="ambient-background-glow"></div>
-
-      {/* Barra superiore minimale con tasto richiudi se aperto */}
-      {step > 0 && (
-        <header className="top-action-bar top-action-bar-minimal">
-          <button
-            type="button"
-            className="btn-pill-action"
-            onClick={handleCloseAll}
-            title="Richiudi brochure"
-          >
-            <RotateCcw size={15} />
-            <span className="btn-pill-text">Richiudi Invito</span>
-          </button>
-        </header>
-      )}
 
       {/* Palcoscenico Principale */}
       <main className="brochure-stage">
         <motion.div
-          className={`navy-support-card view-step-${step}`}
-          layout
-          transition={{ duration: 0.7, ease: "easeInOut" }}
+          className="navy-support-card"
+          transition={{ duration: 1.6, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <div className="navy-embossed-inner-border"></div>
-
-          <div className="clean-folding-card">
+          <motion.div 
+            ref={cardRef}
+            className="clean-folding-card"
+            animate={{ scale: isZoomedIn ? 1 : autoScaleFactor }}
+            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+          >
 
             {/* 1. QUADRATO SUPERIORE (VISIBILE IN STEP 1 & 2) */}
             <AnimatePresence>
@@ -85,13 +120,13 @@ export default function BrochureInvitation() {
                 <motion.div
                   key="top-square"
                   className="card-leaf top-leaf"
-                  initial={{ height: 0, opacity: 0, rotateX: 90 }}
-                  animate={{ height: "auto", opacity: 1, rotateX: 0 }}
-                  exit={{ height: 0, opacity: 0, rotateX: 90 }}
-                  transition={flapTransition}
+                  initial={{ rotateX: -90, opacity: 0 }}
+                  animate={{ rotateX: 0, opacity: 1 }}
+                  exit={{ rotateX: -90, opacity: 0 }}
+                  transition={{ duration: 1.6, ease: [0.25, 0.1, 0.25, 1] }}
                   style={{ transformOrigin: 'bottom center', transformStyle: 'preserve-3d' }}
                 >
-                  <div className="square-leaf-surface top-leaf-surface">
+                  <div className="square-leaf-surface top-leaf-surface leaf-top-rounded">
                     <div className="top-watermark-wrap">
                       <EmbossedFloralHeart className="subtle-relief-watermark" />
                     </div>
@@ -113,8 +148,13 @@ export default function BrochureInvitation() {
             {/*    - STEP 0: Copertina con Cuore a Rilievo (Zero spazi vuoti) */}
             {/*    - STEP 1: Citazione di Seneca in basso a destra           */}
             {/*    - STEP 2: Cerimonia Antonio Cantore & Katia Loliva        */}
-            <div className="card-leaf center-leaf">
-              <div className="square-leaf-surface center-leaf-surface">
+            <motion.div className="card-leaf center-leaf" layout>
+              {/* Il cartoncino blu di fondo fa da cornice SOLO all'anta centrale */}
+              <div className="navy-background-plate">
+                <div className="navy-embossed-inner-border"></div>
+              </div>
+
+              <div className={`square-leaf-surface center-leaf-surface ${step === 0 ? 'leaf-top-rounded leaf-bottom-rounded' : ''} ${step === 1 ? 'leaf-bottom-rounded' : ''}`}>
 
                 {/* STEP 0: COPERTINA */}
                 {step === 0 && (
@@ -190,7 +230,7 @@ export default function BrochureInvitation() {
                 )}
 
               </div>
-            </div>
+            </motion.div>
 
 
             {/* 3. QUADRATO INFERIORE (VISIBILE IN STEP 2) */}
@@ -199,13 +239,13 @@ export default function BrochureInvitation() {
                 <motion.div
                   key="bottom-square"
                   className="card-leaf bottom-leaf"
-                  initial={{ height: 0, opacity: 0, rotateX: -90 }}
-                  animate={{ height: "auto", opacity: 1, rotateX: 0 }}
-                  exit={{ height: 0, opacity: 0, rotateX: -90 }}
-                  transition={flapTransition}
+                  initial={{ rotateX: 90, opacity: 0 }}
+                  animate={{ rotateX: 0, opacity: 1 }}
+                  exit={{ rotateX: 90, opacity: 0 }}
+                  transition={{ duration: 1.6, ease: [0.25, 0.1, 0.25, 1] }}
                   style={{ transformOrigin: 'top center', transformStyle: 'preserve-3d' }}
                 >
-                  <div className="square-leaf-surface bottom-leaf-surface">
+                  <div className="square-leaf-surface bottom-leaf-surface leaf-bottom-rounded">
                     <div className="crease-divider top-divider"></div>
 
                     <div className="reception-intro-text">
@@ -260,9 +300,28 @@ export default function BrochureInvitation() {
               )}
             </AnimatePresence>
 
-          </div>
+          </motion.div>
         </motion.div>
       </main>
+
+      {/* Tasto Fluttuante Zoom (visibile solo da step 1) */}
+      <AnimatePresence>
+        {step >= 1 && (
+          <motion.button
+            key="zoom-btn"
+            className="zoom-toggle-btn"
+            onClick={toggleZoom}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            title={isZoomedIn ? "Adatta allo schermo" : "Ingrandisci per leggere"}
+          >
+            {isZoomedIn ? <ZoomOut size={22} /> : <ZoomIn size={22} />}
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Pulsanti di Navigazione in Basso (visibili solo dal secondo passaggio in poi) */}
       {step >= 1 && (

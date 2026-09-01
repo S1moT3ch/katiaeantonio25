@@ -78,6 +78,12 @@ body {
   justify-content: center;
   position: relative;
   padding: 1.5rem 1rem 5.5rem 1rem;
+  transition: padding-top 0.85s cubic-bezier(0.22, 1, 0.36, 1), padding-bottom 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.brochure-page-container.is-zoomed-in {
+  padding-top: clamp(430px, 110vw, 500px);
+  padding-bottom: clamp(430px, 110vw, 500px);
 }
 
 .ambient-background-glow {
@@ -138,6 +144,34 @@ body {
   background: #ffffff;
   border-color: var(--silver-accent);
   transform: translateY(-1px);
+}
+
+.zoom-toggle-btn {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--navy-bg);
+  color: white;
+  border: 2px solid var(--gold-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(20, 32, 54, 0.3);
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.zoom-toggle-btn:hover {
+  transform: scale(1.1);
+  background: var(--navy-light);
+}
+
+.zoom-toggle-btn:active {
+  transform: scale(0.95);
 }
 
 .text-success {
@@ -268,15 +302,27 @@ body {
   justify-content: center;
 }
 
-/* Cartoncino Blu Notte di Fondo */
+/* Contenitore Strutturale (mantiene il padding) */
 .navy-support-card {
   width: 100%;
-  background: radial-gradient(circle at 50% 30%, #1d2c49 0%, #142036 70%, #0d1626 100%);
-  border-radius: 12px;
   padding: 1.4rem;
   position: relative;
-  box-shadow: var(--shadow-tabletop);
   transform-style: preserve-3d;
+  /* Sfondo e ombra spostati in .navy-background-plate per non espandersi con le ante */
+}
+
+/* Cartoncino Blu Notte di Fondo (ancorato al centro) */
+.navy-background-plate {
+  position: absolute;
+  top: -1.4rem;
+  left: -1.4rem;
+  right: -1.4rem;
+  bottom: -1.4rem;
+  background: radial-gradient(circle at 50% 30%, #1d2c49 0%, #142036 70%, #0d1626 100%);
+  border-radius: 12px;
+  box-shadow: var(--shadow-tabletop);
+  transform: translateZ(-2px); /* Spinto fisicamente dietro la carta 3D */
+  pointer-events: none;
 }
 
 .navy-embossed-inner-border {
@@ -297,15 +343,11 @@ body {
    ========================================================================== */
 .clean-folding-card {
   width: 100%;
-  display: flex;
-  flex-direction: column;
   position: relative;
   transform-style: preserve-3d;
-  background-color: var(--cream-paper);
-  border: 1px solid var(--cream-border);
-  border-radius: 4px;
-  box-shadow: var(--shadow-paper);
-  overflow: hidden;
+  /* Sfondo e ombra spostati in .navy-background-plate per non espandersi con le ante */
+  background-color: transparent;
+  overflow: visible;
 }
 
 .card-leaf {
@@ -313,6 +355,27 @@ body {
   position: relative;
   transform-style: preserve-3d;
   will-change: transform, opacity;
+}
+
+.top-leaf {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 30;
+}
+
+.center-leaf {
+  position: relative;
+  z-index: 10;
+}
+
+.bottom-leaf {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 20;
 }
 
 /* CIASCUNA ANTA È RIGOROSAMENTE UN QUADRATO (1:1) */
@@ -326,6 +389,23 @@ body {
   background-size: auto, 12px 12px;
   position: relative;
   overflow: hidden;
+  border-left: 1px solid var(--cream-border);
+  border-right: 1px solid var(--cream-border);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Ombra per ogni singolo pannello */
+  transition: border-radius 0.3s, border 0.3s;
+}
+
+/* Classi dinamiche per i bordi e angoli in base allo stato di apertura */
+.leaf-top-rounded {
+  border-top: 1px solid var(--cream-border);
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.leaf-bottom-rounded {
+  border-bottom: 1px solid var(--cream-border);
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 /* Linea di piega orizzontale in bassorilievo */
