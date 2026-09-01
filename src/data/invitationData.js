@@ -2,7 +2,7 @@ export const invitationData = {
   couple: {
     groom: "Antonio Cantore",
     bride: "Katia Loliva",
-    shortNames: "Antonio & Katia",
+    shortNames: "Katia & Antonio",
     monogram: "A & K",
     anniversaryYears: "25°",
     anniversaryType: "Nozze d'Argento",
@@ -12,16 +12,16 @@ export const invitationData = {
   },
 
   quote: {
-    text: "«Nessuna gioia è grande se non è condivisa»",
+    text: "\"Nessuna gioia\nè grande\nse non è condivisa\"",
     author: "Seneca",
   },
 
   event: {
     // Data dei 25 anni di matrimonio
-    dateIso: "2026-09-26T10:30:00",
+    dateIso: "2026-09-26T11:30:00",
     formattedDate: "Sabato 26 Settembre 2026",
-    anniversaryHeading: "Ringrazieremo per i nostri 25 anni di Matrimonio",
-    ceremonyTime: "Ore 10:30",
+    anniversaryHeading: "Ringrazieremo il Signore per i nostri 25 anni di Matrimonio",
+    ceremonyTime: "Ore 11:30",
     receptionTime: "A seguire",
 
     ceremony: {
@@ -35,8 +35,8 @@ export const invitationData = {
 
     reception: {
       title: "Il Ricevimento",
-      introText: "Dopo la celebrazione ci ritroveremo per far festa insieme presso la Sala Ricevimenti",
-      placeName: "«Masseria Foggiagrande»",
+      introText: "Dopo la celebrazione ci ritroveremo per far festa \ninsieme presso la Sala Ricevimenti",
+      placeName: "Masseria Foggiagrande",
       address: "Strada Comunale Foggia Grande, 1",
       city: "Putignano (BA)",
       mapsUrl: "https://www.google.com/maps/search/?api=1&query=Masseria+Foggiagrande+Putignano",

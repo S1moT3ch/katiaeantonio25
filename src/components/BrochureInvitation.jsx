@@ -54,7 +54,7 @@ export default function BrochureInvitation() {
 
   const handleTouchEnd = (e) => {
     if (touchStartY === null) return;
-    
+
     // Ignoriamo lo swipe se siamo zoomati
     if (window.visualViewport && window.visualViewport.scale > 1.05) {
       setTouchStartY(null);
@@ -69,7 +69,7 @@ export default function BrochureInvitation() {
     } else if (distance < -50) {
       handlePrevStep(); // Swipe down (chiude)
     }
-    
+
     setTouchStartY(null);
   };
 
@@ -80,14 +80,14 @@ export default function BrochureInvitation() {
   useEffect(() => {
     const updateScale = () => {
       if (!cardRef.current) return;
-      
+
       const baseHeight = cardRef.current.offsetHeight;
       const baseWidth = cardRef.current.offsetWidth;
       if (baseHeight === 0 || baseWidth === 0) return;
 
       // Calcoliamo l'altezza e la larghezza totale stimata in base allo step
       // Aggiungiamo un margine per respiro (es. 10% in altezza, un po' di padding per la larghezza)
-      let requiredHeight = baseHeight * 1.1; 
+      let requiredHeight = baseHeight * 1.1;
       if (step >= 1) {
         requiredHeight = baseHeight * 3.3;
       }
@@ -106,7 +106,7 @@ export default function BrochureInvitation() {
         // Aggiungiamo un piccolissimo margine (es. diviso per 1.05) per non incollarlo ai bordi del telefono
         scaleW = availableWidth / (requiredWidth * 1.05);
       }
-      
+
       if (requiredHeight > availableHeight) {
         scaleH = availableHeight / requiredHeight;
       }
@@ -133,7 +133,7 @@ export default function BrochureInvitation() {
   };
 
   return (
-    <div 
+    <div
       className="brochure-page-container"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
@@ -147,7 +147,7 @@ export default function BrochureInvitation() {
           className="navy-support-card"
           transition={{ duration: 1.6, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <motion.div 
+          <motion.div
             ref={cardRef}
             className="clean-folding-card"
             animate={{ scale: autoScaleFactor }}
@@ -209,10 +209,10 @@ export default function BrochureInvitation() {
                   >
                     <div className="cover-typography-container">
                       <div className="cover-monogram-badge">25°</div>
+                      <h2 className="cover-couple-names">Katia e Antonio</h2>
                       <div className="anniversary-subtle-tag">
-                        <span>{couple.anniversaryYears} {couple.anniversaryType}</span>
+                        <span>{couple.anniversaryType}</span>
                       </div>
-                      <h2 className="cover-couple-names">Antonio & Katia</h2>
                     </div>
                     <div className="tap-to-open-pill">
                       <ChevronUp size={16} className="bounce-up" />

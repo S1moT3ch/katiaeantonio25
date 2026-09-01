@@ -14,14 +14,14 @@ export default function RsvpModal({ isOpen, onClose, rsvpData, coupleData }) {
   const [representativeName, setRepresentativeName] = useState('');
   const [guestsCount, setGuestsCount] = useState(2);
   const [attendance, setAttendance] = useState('both'); // 'both', 'ceremony', 'cannot'
-  
+
   // Mappa delle quantità per le intolleranze comuni: { gluten: 1, lactose: 2, ... }
   const [dietaryCounts, setDietaryCounts] = useState({});
-  
+
   // Intolleranze / allergie personalizzate: [ { id: 1, name: 'Fragole', count: 1 }, ... ]
   const [customIntolerances, setCustomIntolerances] = useState([]);
   const [customNameInput, setCustomNameInput] = useState('');
-  
+
   // Note generiche opzionali
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -238,7 +238,7 @@ export default function RsvpModal({ isOpen, onClose, rsvpData, coupleData }) {
                 <span>Saremo presenti</span>
               </label>
 
-              <label className={`radio-pill ${attendance === 'ceremony' ? 'active' : ''}`}>
+              {/*<label className={`radio-pill ${attendance === 'ceremony' ? 'active' : ''}`}>
                 <input
                   type="radio"
                   name="attendance"
@@ -247,7 +247,7 @@ export default function RsvpModal({ isOpen, onClose, rsvpData, coupleData }) {
                   onChange={() => setAttendance('ceremony')}
                 />
                 <span>Solo Celebrazione</span>
-              </label>
+              </label>*/}
 
               <label className={`radio-pill ${attendance === 'cannot' ? 'active' : ''}`}>
                 <input
