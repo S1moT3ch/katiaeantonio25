@@ -7,9 +7,7 @@ import {
   RotateCcw,
   ChevronUp,
   ChevronDown,
-  Phone,
-  ZoomIn,
-  ZoomOut
+  Phone
 } from 'lucide-react';
 import EmbossedFloralHeart from './EmbossedFloralHeart';
 import Countdown from './Countdown';
@@ -22,7 +20,6 @@ export default function BrochureInvitation() {
   //       2 = Passo 2 (Apertura verso il basso: Trittico completo con Cerimonia e Ricevimento)
   const [step, setStep] = useState(0);
   const [isRsvpOpen, setIsRsvpOpen] = useState(false);
-  const [isZoomedIn, setIsZoomedIn] = useState(false);
 
   const { couple, event, quote } = invitationData;
 
@@ -44,11 +41,36 @@ export default function BrochureInvitation() {
 
   const handleCloseAll = () => {
     setStep(0);
-    setIsZoomedIn(false);
   };
 
-  const toggleZoom = () => {
-    setIsZoomedIn(!isZoomedIn);
+  const [touchStartY, setTouchStartY] = useState(null);
+
+  const handleTouchStart = (e) => {
+    // Registra lo start solo se c'è un solo dito (no pinch-zoom)
+    if (e.touches.length === 1) {
+      setTouchStartY(e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartY === null) return;
+    
+    // Ignoriamo lo swipe se siamo zoomati
+    if (window.visualViewport && window.visualViewport.scale > 1.05) {
+      setTouchStartY(null);
+      return;
+    }
+
+    const touchEndY = e.changedTouches[0].clientY;
+    const distance = touchStartY - touchEndY;
+
+    if (distance > 50) {
+      handleNextStep(); // Swipe up (apre)
+    } else if (distance < -50) {
+      handlePrevStep(); // Swipe down (chiude)
+    }
+    
+    setTouchStartY(null);
   };
 
   const cardRef = useRef(null);
@@ -59,25 +81,38 @@ export default function BrochureInvitation() {
     const updateScale = () => {
       if (!cardRef.current) return;
       
-      // Altezza base del quadrato centrale (es. max 430px)
       const baseHeight = cardRef.current.offsetHeight;
-      if (baseHeight === 0) return;
+      const baseWidth = cardRef.current.offsetWidth;
+      if (baseHeight === 0 || baseWidth === 0) return;
 
-      // Calcoliamo l'altezza totale stimata in base allo step
-      // Aggiungiamo un 10% di margine per respiro (1.1, 3.3)
-      // Se lo step è >= 1 facciamo zoom-out calcolando lo spazio per tutte e 3 le pagine fin da subito
+      // Calcoliamo l'altezza e la larghezza totale stimata in base allo step
+      // Aggiungiamo un margine per respiro (es. 10% in altezza, un po' di padding per la larghezza)
       let requiredHeight = baseHeight * 1.1; 
       if (step >= 1) {
         requiredHeight = baseHeight * 3.3;
       }
+      // La larghezza richiesta è esattamente la larghezza del piatto blu,
+      // che essendo in rapporto 16/11 rispetto al quadrato bianco, è 1.454545 volte il baseWidth.
+      const requiredWidth = baseWidth * 1.454545;
 
       const availableHeight = window.innerHeight;
+      const availableWidth = window.innerWidth;
 
-      if (requiredHeight > availableHeight) {
-        setAutoScaleFactor(availableHeight / requiredHeight);
-      } else {
-        setAutoScaleFactor(1);
+      let scaleH = 1;
+      let scaleW = 1;
+
+      // Su schermi piccoli, forziamo il ridimensionamento per far entrare TUTTO il piatto blu nella larghezza.
+      if (requiredWidth > availableWidth) {
+        // Aggiungiamo un piccolissimo margine (es. diviso per 1.05) per non incollarlo ai bordi del telefono
+        scaleW = availableWidth / (requiredWidth * 1.05);
       }
+      
+      if (requiredHeight > availableHeight) {
+        scaleH = availableHeight / requiredHeight;
+      }
+
+      // Imposta il minor scale (quello più restrittivo)
+      setAutoScaleFactor(Math.min(scaleH, scaleW, 1));
     };
 
     updateScale();
@@ -98,7 +133,12 @@ export default function BrochureInvitation() {
   };
 
   return (
-    <div className={`brochure-page-container ${isZoomedIn ? 'is-zoomed-in' : ''}`}>
+    <div 
+      className="brochure-page-container"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
+    >
       <div className="ambient-background-glow"></div>
 
       {/* Palcoscenico Principale */}
@@ -110,7 +150,7 @@ export default function BrochureInvitation() {
           <motion.div 
             ref={cardRef}
             className="clean-folding-card"
-            animate={{ scale: isZoomedIn ? 1 : autoScaleFactor }}
+            animate={{ scale: autoScaleFactor }}
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
           >
 
@@ -304,51 +344,18 @@ export default function BrochureInvitation() {
         </motion.div>
       </main>
 
-      {/* Tasto Fluttuante Zoom (visibile solo da step 1) */}
-      <AnimatePresence>
-        {step >= 1 && (
-          <motion.button
-            key="zoom-btn"
-            className="zoom-toggle-btn"
-            onClick={toggleZoom}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            title={isZoomedIn ? "Adatta allo schermo" : "Ingrandisci per leggere"}
-          >
-            {isZoomedIn ? <ZoomOut size={22} /> : <ZoomIn size={22} />}
-          </motion.button>
-        )}
-      </AnimatePresence>
-
-      {/* Pulsanti di Navigazione in Basso (visibili solo dal secondo passaggio in poi) */}
-      {step >= 1 && (
+      {/* Pulsanti di Navigazione in Basso (visibili solo durante l'apertura) */}
+      {step === 1 && (
         <footer className="bottom-nav-controls">
-          {step === 1 && (
-            <div className="step-buttons-group">
-              <button type="button" className="btn-action-secondary" onClick={handlePrevStep}>
-                <span> Vai Indietro</span>
-              </button>
-              <button type="button" className="btn-action-primary" onClick={handleNextStep}>
-                <span>Continua ad aprire</span>
-                <ChevronDown size={18} />
-              </button>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="step-buttons-group">
-              <button type="button" className="btn-action-secondary" onClick={handleCloseAll}>
-                <RotateCcw size={16} />
-                <span>Richiudi Invito</span>
-              </button>
-              <button type="button" className="btn-action-primary" onClick={() => setIsRsvpOpen(true)}>
-                <span>Conferma Partecipazione</span>
-              </button>
-            </div>
-          )}
+          <div className="step-buttons-group">
+            <button type="button" className="btn-action-secondary" onClick={handlePrevStep}>
+              <span> Vai Indietro</span>
+            </button>
+            <button type="button" className="btn-action-primary" onClick={handleNextStep}>
+              <span>Continua ad aprire</span>
+              <ChevronDown size={18} />
+            </button>
+          </div>
         </footer>
       )}
 

@@ -56,7 +56,9 @@ body {
   font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1.6;
-  overflow-x: hidden;
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
 }
 
 body {
@@ -294,8 +296,8 @@ body {
    MAIN BROCHURE STAGE & NAVY BACKING CARD
    ========================================================================== */
 .brochure-stage {
-  width: 100%;
-  max-width: 430px;
+  width: 480px;
+  max-width: none;
   perspective: 2500px;
   z-index: 10;
   display: flex;
@@ -305,7 +307,8 @@ body {
 /* Contenitore Strutturale (mantiene il padding) */
 .navy-support-card {
   width: 100%;
-  padding: 1.4rem;
+  /* Padding del 15.625% imposta esattamente un rapporto di 16/11 tra il lato del rettangolo blu e il lato del quadrato bianco */
+  padding: 15.625%;
   position: relative;
   transform-style: preserve-3d;
   /* Sfondo e ombra spostati in .navy-background-plate per non espandersi con le ante */
@@ -314,11 +317,12 @@ body {
 /* Cartoncino Blu Notte di Fondo (ancorato al centro) */
 .navy-background-plate {
   position: absolute;
-  top: -1.4rem;
-  left: -1.4rem;
-  right: -1.4rem;
-  bottom: -1.4rem;
-  background: radial-gradient(circle at 50% 30%, #1d2c49 0%, #142036 70%, #0d1626 100%);
+  /* Espande il piatto blu per un totale del 145.45% (16/11) rispetto al bianco */
+  top: -22.7272%;
+  left: -22.7272%;
+  right: -22.7272%;
+  bottom: -22.7272%;
+  background: radial-gradient(circle at 50% 30%, #2a4066 0%, #1d2c49 70%, #142036 100%);
   border-radius: 12px;
   box-shadow: var(--shadow-tabletop);
   transform: translateZ(-2px); /* Spinto fisicamente dietro la carta 3D */
