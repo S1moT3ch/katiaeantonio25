@@ -142,7 +142,10 @@ def test_webhook(num_requests=100):
     print(f"[*] Inizio test batch: {num_requests} invii verso Google Sheet...\n")
     
     # Questo dizionario simula il comportamento di update (sovrascrittura) del GAS per i duplicati
-    database_locale = {}
+    database_locale = {
+        "Pranzo": {},
+        "Sera Monopoli": {}
+    }
     success_count = 0
 
     for i in range(num_requests):
@@ -150,17 +153,17 @@ def test_webhook(num_requests=100):
         
         # Chiave univoca per i duplicati usata nel GAS: lowercase e spazi singoli
         chiave_confronto = re.sub(r'\s+', ' ', payload["nomeFamiglia"].lower()).strip()
+        target_sheet = payload["targetSheet"]
         
         # Aggiorniamo il nostro DB locale (simulando l'update del foglio Excel)
-        is_update = chiave_confronto in database_locale
-        database_locale[chiave_confronto] = payload
+        is_update = chiave_confronto in database_locale[target_sheet]
+        database_locale[target_sheet][chiave_confronto] = payload
 
-        print(f"[{i+1:02d}/{num_requests}] {'[UPD]' if is_update else '[NEW]'} Invio: {payload['nomeFamiglia']} ({payload['numeroOspiti']} p) | {payload['partecipazione']} | {payload['intolleranzeNote']}")
+        print(f"[{i+1:02d}/{num_requests}] {'[UPD]' if is_update else '[NEW]'} [{target_sheet}] Invio: {payload['nomeFamiglia']} ({payload['numeroOspiti']} p) | {payload['partecipazione']} | {payload['intolleranzeNote']}")
         
         try:
             response = requests.post(WEBHOOK_URL, json=payload)
             if response.status_code == 200:
-                # print(f"    -> OK: {response.json().get('action', 'N/A')}")
                 success_count += 1
             else:
                 print(f"    [X] Errore HTTP {response.status_code}")
@@ -171,22 +174,24 @@ def test_webhook(num_requests=100):
 
     print("\n" + "="*60)
     print("📊 RIEPILOGO TOTALI CALCOLATO DA PYTHON")
-    print("Confrontalo con il foglio 'Riepilogo Totali' su Excel!")
+    print("Confrontalo con i fogli 'Riepilogo Pranzo' e 'Riepilogo Sera Monopoli' su Excel!")
     print("="*60)
     
-    tot_famiglie, tot_presenti, tot_solo_cerimonia, tot_assenti, mappa_intolleranze = calcola_totali(database_locale)
-    
-    print(f"👨👩👧👦 Numero Totale Famiglie Rispondenti : {tot_famiglie}")
-    print(f"👥 Totale Ospiti a Cerimonia & Ricevimento: {tot_presenti}")
-    print(f"⛪ Totale Ospiti solo Cerimonia          : {tot_solo_cerimonia}")
-    print(f"❌ Totale Persone Assenti               : {tot_assenti}")
-    print("\n🍽️ DETTAGLIO INTOLLERANZE & ALLERGIE")
-    
-    if mappa_intolleranze:
-        for cat, qta in sorted(mappa_intolleranze.items()):
-            print(f"   - {cat}: {qta}")
-    else:
-        print("   - Nessuna intolleranza segnalata al momento")
+    for evento in ["Pranzo", "Sera Monopoli"]:
+        tot_famiglie, tot_presenti, tot_solo_cerimonia, tot_assenti, mappa_intolleranze = calcola_totali(database_locale[evento])
+        
+        print(f"\n📌 EVENTO: {evento.upper()}")
+        print(f"👨👩👧👦 Numero Totale Famiglie Rispondenti : {tot_famiglie}")
+        print(f"👥 Totale Ospiti a Cerimonia & Ricevimento: {tot_presenti}")
+        print(f"⛪ Totale Ospiti solo Cerimonia          : {tot_solo_cerimonia}")
+        print(f"❌ Totale Persone Assenti               : {tot_assenti}")
+        print("🍽️ DETTAGLIO INTOLLERANZE & ALLERGIE")
+        
+        if mappa_intolleranze:
+            for cat, qta in sorted(mappa_intolleranze.items()):
+                print(f"   - {cat}: {qta}")
+        else:
+            print("   - Nessuna intolleranza segnalata al momento")
         
     print("="*60)
     print(f"🎉 Test completato: {success_count}/{num_requests} richieste inviate con successo.")

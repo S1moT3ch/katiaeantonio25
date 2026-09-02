@@ -286,17 +286,19 @@ export default function BrochureInvitation() {
                       {event.reception.introText}
                     </div>
 
-                    <h3 className="reception-venue-title">
-                      {event.reception.placeName}
-                    </h3>
+                    <div className="reception-venue-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                      <h3 className="reception-venue-title">
+                        {event.reception.placeName}
+                      </h3>
 
-                    <p className="reception-venue-address">
-                      {event.reception.address}
-                    </p>
+                      <p className="reception-venue-address">
+                        {event.reception.address}
+                      </p>
 
-                    <p className="reception-venue-address">
-                      {event.reception.city}
-                    </p>
+                      <p className="reception-venue-address">
+                        {event.reception.city}
+                      </p>
+                    </div>
 
                     {/*{event.reception.details && (
                       <p className="reception-venue-details">
@@ -316,7 +318,7 @@ export default function BrochureInvitation() {
                       </a>
                     </div>
 
-                    <div className="rsvp-divider-line"></div>
+                    {/*<div className="rsvp-divider-line"></div>*/}
 
                     <div className="rsvp-section-box">
                       {/*<div className="rsvp-phones-row">
