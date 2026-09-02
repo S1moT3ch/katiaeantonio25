@@ -95,14 +95,18 @@ def calcola_totali(database_locale):
 
     for record in database_locale.values():
         tot_famiglie += 1
-        ospiti = int(record["numeroOspiti"])
+        
+        # Simuliamo il comportamento esatto (e il bug) del GAS:
+        # Nel tuo GAS c'è: var numeroOspiti = Number(data.numeroOspiti) || 1;
+        # Se ospiti è 0, diventerà 1.
+        ospiti_raw = int(record["numeroOspiti"])
+        ospiti = ospiti_raw if ospiti_raw != 0 else 1
+
         partec = record["partecipazione"].lower()
         intolleranze = record["intolleranzeNote"].strip()
 
         # Calcolo presenze
         if "presenti" in partec or "ricevimento" in partec or "entrambi" in partec:
-            # Attenzione, il GAS fa un check per "cerimonia" ma "ricevimento" ha la precedenza se lo mettiamo prima
-            # In realtà il GAS fa: if(presenti|ricevimento) -> totPresenti; else if(cerimonia) -> totSoloCerimonia
             tot_presenti += ospiti
         elif "cerimonia" in partec or "messa" in partec or "celebrazione" in partec:
             tot_solo_cerimonia += ospiti
@@ -133,7 +137,7 @@ def calcola_totali(database_locale):
     return tot_famiglie, tot_presenti, tot_solo_cerimonia, tot_assenti, mappa_intolleranze
 
 
-def test_webhook(num_requests=50):
+def test_webhook(num_requests=100):
     print(f"[*] Inizio test batch: {num_requests} invii verso Google Sheet...\n")
     
     # Questo dizionario simula il comportamento di update (sovrascrittura) del GAS per i duplicati
@@ -187,5 +191,5 @@ def test_webhook(num_requests=50):
     print(f"🎉 Test completato: {success_count}/{num_requests} richieste inviate con successo.")
 
 if __name__ == "__main__":
-    # Avvia 50 richieste (modifica il numero se vuoi fare un test più rapido)
-    test_webhook(50)
+    # Avvia 100 richieste (modifica il numero se vuoi fare un test più rapido)
+    test_webhook(100)

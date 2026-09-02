@@ -20,7 +20,7 @@ export const invitationData = {
     // Data dei 25 anni di matrimonio
     dateIso: "2026-09-26T11:30:00",
     formattedDate: "Sabato 26 Settembre 2026",
-    anniversaryHeading: "Ringrazieremo il Signore per i nostri 25 anni di Matrimonio",
+    anniversaryHeading: "Con Simone e Andrea, insieme a voi,\n ringrazieremo il Signore per averci benignamente assistito in questi\n25 anni di Matrimonio",
     ceremonyTime: "Ore 11:30",
     receptionTime: "A seguire",
 
@@ -35,7 +35,7 @@ export const invitationData = {
 
     reception: {
       title: "Il Ricevimento",
-      introText: "Dopo la celebrazione ci ritroveremo per far festa \ninsieme presso la Sala Ricevimenti",
+      introText: "La nostra festa continuerà, nella semplicità,\npranzando insieme presso l'Agriturismo",
       placeName: "Masseria Foggiagrande",
       address: "Strada Comunale Foggia Grande, 1",
       city: "Putignano (BA)",

@@ -166,16 +166,9 @@ export default function BrochureInvitation() {
                   transition={{ duration: 1.6, ease: [0.25, 0.1, 0.25, 1] }}
                   style={{ transformOrigin: 'bottom center', transformStyle: 'preserve-3d' }}
                 >
-                  <div className="square-leaf-surface top-leaf-surface leaf-top-rounded">
-                    <div className="top-watermark-wrap">
-                      <EmbossedFloralHeart className="subtle-relief-watermark" />
-                    </div>
-                    <div className="top-anniversary-badge-wrap">
-                      <span className="top-silver-badge">{couple.anniversaryYears} ANNIVERSARIO</span>
-                      <p className="top-years-span">{couple.yearsSpan}</p>
-                    </div>
-                    <div className="top-countdown-container">
-                      <Countdown targetDate={event.dateIso} />
+                  <div className="square-leaf-surface top-leaf-surface leaf-top-rounded" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="polaroid-frame">
+                      <img src="/Copertina.jpg" alt="Copertina" className="polaroid-image" />
                     </div>
                     <div className="crease-divider bottom-divider"></div>
                   </div>
@@ -263,9 +256,9 @@ export default function BrochureInvitation() {
                       <h2 className="couple-name-bride">{couple.bride}</h2>
                     </div>
 
-                    <div className="center-addresses">
+                    {/*<div className="center-addresses">
                       {couple.addresses}
-                    </div>
+                    </div>*/}
                   </motion.div>
                 )}
 
@@ -315,7 +308,7 @@ export default function BrochureInvitation() {
                     <div className="rsvp-divider-line"></div>
 
                     <div className="rsvp-section-box">
-                      <div className="rsvp-phones-row">
+                      {/*<div className="rsvp-phones-row">
                         <a href={`tel:${event.rsvp.phone1}`} className="phone-chip">
                           <Phone size={12} />
                           <span>{event.rsvp.phoneFormatted1}</span>
@@ -324,7 +317,7 @@ export default function BrochureInvitation() {
                           <Phone size={12} />
                           <span>{event.rsvp.phoneFormatted2}</span>
                         </a>
-                      </div>
+                      </div>*/}
 
                       <button
                         type="button"

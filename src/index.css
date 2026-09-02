@@ -469,12 +469,12 @@ body {
 
 .cover-monogram-badge {
   font-family: var(--font-serif);
-  font-size: 2.8rem;
+  font-size: 3.2rem;
   font-weight: 700;
-  color: var(--ink-navy);
-  background: var(--silver-gradient);
+  background: linear-gradient(135deg, #8b9298 0%, #d8dcde 40%, #ffffff 50%, #d8dcde 60%, #6b7280 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0px 2px 3px rgba(20, 32, 54, 0.3));
   line-height: 1;
   margin-bottom: 0.5rem;
 }
@@ -498,15 +498,14 @@ body {
 .tap-to-open-pill {
   margin-top: 1rem;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  background: var(--navy-bg);
-  color: #ffffff;
+  background: transparent;
+  color: var(--ink-navy);
   padding: 0.5rem 1.1rem;
-  border-radius: 50px;
   font-size: 0.85rem;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(20, 32, 54, 0.25);
   animation: pulseButton 2s infinite ease-in-out;
   cursor: pointer;
 }
@@ -609,6 +608,7 @@ body {
   font-weight: 400;
   color: var(--ink-navy);
   line-height: 1.4;
+  white-space: pre-wrap;
 }
 
 .center-date-highlight {
@@ -708,29 +708,35 @@ body {
   font-weight: 500;
 }
 
-.top-countdown-container {
-  margin-top: 0.4rem;
+.polaroid-frame {
+  width: 75%;
+  background: #ffffff;
+  padding: 0.6rem 0.6rem 2.2rem 0.6rem;
+  box-shadow: 0 4px 15px rgba(20, 32, 54, 0.15), inset 0 0 0 1px rgba(0,0,0,0.05);
+  transform: rotate(-3deg);
+  position: relative;
+}
+
+.polaroid-frame::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(2deg);
+  width: 60px;
+  height: 25px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.05);
+  backdrop-filter: blur(2px);
+  z-index: 10;
+}
+
+.polaroid-image {
   width: 100%;
-}
-
-.countdown-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
-}
-
-.countdown-title {
-  font-family: var(--font-invitation);
-  font-size: 0.82rem;
-  color: var(--ink-muted);
-  letter-spacing: 0.5px;
-}
-
-.countdown-grid {
-  display: flex;
-  gap: 0.35rem;
-  justify-content: center;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
 }
 
 .countdown-card {
