@@ -1,6 +1,17 @@
 @charset "UTF-8";
 
 /* ==========================================================================
+   CUSTOM LOCAL FONTS
+   ========================================================================== */
+@font-face {
+  font-family: 'Segoe Print Web';
+  src: url('/segoepr.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ==========================================================================
    COLOR PALETTE & TYPOGRAPHY
    ========================================================================== */
 :root {
@@ -27,8 +38,8 @@
   --silver-gradient: linear-gradient(135deg, #F5F6F8 0%, #D8DBE0 35%, #FFFFFF 50%, #BCC0C8 75%, #9498A2 100%);
 
   /* Font Autentici dell'Invito Originale (Segoe Print) */
-  --font-invitation: "Segoe Print", "Caveat", "Bradley Hand", "Bradley Hand ITC", cursive, sans-serif;
-  --font-script: "Segoe Print", "Caveat", "Bradley Hand", cursive;
+  --font-invitation: "Segoe Print Web", "Segoe Print", "Patrick Hand", "Caveat", "Bradley Hand", cursive, sans-serif;
+  --font-script: "Segoe Print Web", "Segoe Print", "Patrick Hand", "Caveat", cursive;
   --font-serif: "Cormorant Garamond", "Playfair Display", Georgia, serif;
   --font-sans: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
@@ -54,7 +65,7 @@ body {
   background-color: #EDE8DD;
   color: var(--ink-dark);
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: 13.5px;
   line-height: 1.6;
   overflow: hidden;
   position: fixed;
@@ -770,7 +781,7 @@ body {
   background: linear-gradient(180deg, var(--cream-paper-light) 0%, #F5EFE2 100%);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-evenly;
   gap: 0.6rem;
   border-top: 1px solid var(--cream-border);
 }
@@ -800,6 +811,14 @@ body {
   color: var(--ink-navy);
 }
 
+.reception-venue-details {
+  font-family: var(--font-invitation);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  margin-top: -0.2rem;
+}
+
 .reception-actions {
   display: flex;
   justify-content: center;
@@ -812,20 +831,18 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  background: var(--navy-bg);
-  color: #ffffff;
+  background: transparent;
+  color: var(--ink-navy);
   text-decoration: none;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
   padding: 0.4rem 0.85rem;
-  border-radius: 50px;
-  box-shadow: 0 2px 6px rgba(20, 32, 54, 0.2);
   transition: all 0.2s ease;
 }
 
 .btn-navy-link:hover {
-  background: var(--navy-light);
   transform: translateY(-1px);
+  color: var(--ink-dark);
 }
 
 .rsvp-divider-line {
@@ -839,6 +856,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 0.4rem;
+  margin-top: 0.6rem;
 }
 
 .rsvp-phones-row {
@@ -874,23 +892,41 @@ body {
   gap: 0.4rem;
   width: 100%;
   max-width: 260px;
-  background: var(--navy-bg);
-  color: #ffffff;
+  background: transparent;
+  color: var(--ink-navy);
   border: none;
   font-family: var(--font-sans);
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 600;
   padding: 0.65rem 1.1rem;
-  border-radius: 50px;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(20, 32, 54, 0.25);
   transition: all 0.25s ease;
 }
 
 .btn-rsvp-primary:hover {
-  background: var(--navy-light);
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(20, 32, 54, 0.35);
+  color: var(--ink-dark);
+}
+
+@keyframes iconPulse {
+  0% { 
+    transform: scale(1); 
+    filter: drop-shadow(0 0 0 rgba(20, 32, 54, 0));
+  }
+  50% { 
+    transform: scale(1.35) translateY(-2px); 
+    filter: drop-shadow(0 4px 6px rgba(20, 32, 54, 0.4));
+  }
+  100% { 
+    transform: scale(1); 
+    filter: drop-shadow(0 0 0 rgba(20, 32, 54, 0));
+  }
+}
+
+.btn-navy-link svg,
+.btn-rsvp-primary svg {
+  animation: iconPulse 1.6s infinite ease-in-out;
+  color: var(--navy-bg);
 }
 
 /* ==========================================================================

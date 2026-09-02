@@ -10,7 +10,7 @@ const COMMON_DIETARY_OPTIONS = [
   { id: 'highchair', label: 'Seggiolone Bimbo', icon: '👶' },
 ];
 
-export default function RsvpModal({ isOpen, onClose, rsvpData, coupleData }) {
+export default function RsvpModal({ isOpen, onClose, rsvpData, coupleData, eventData }) {
   const [representativeName, setRepresentativeName] = useState('');
   const [guestsCount, setGuestsCount] = useState(2);
   const [attendance, setAttendance] = useState('both'); // 'both', 'ceremony', 'cannot'
@@ -103,6 +103,11 @@ export default function RsvpModal({ isOpen, onClose, rsvpData, coupleData }) {
     let attendanceText = 'Saremo presenti a Cerimonia e Ricevimento';
     if (attendance === 'ceremony') attendanceText = 'Solo Celebrazione';
     if (attendance === 'cannot') attendanceText = 'Purtroppo non potremo esserci';
+    
+    // Aggiungo il tipo di evento per differenziare Pranzo/Sera
+    if (attendance !== 'cannot' && eventData?.partyType) {
+      attendanceText += ` (${eventData.partyType})`;
+    }
 
     const timestamp = new Date().toLocaleString('it-IT', { timeZone: 'Europe/Rome' });
     const dietaryFormatted = formatDietarySummary();
@@ -112,6 +117,8 @@ export default function RsvpModal({ isOpen, onClose, rsvpData, coupleData }) {
     const sheetsEndpoint = rsvpData?.googleSheetsScriptUrl;
     if (sheetsEndpoint && sheetsEndpoint.trim().length > 0) {
       try {
+        const targetSheet = eventData?.partyType === 'Sera' ? 'Sera Monopoli' : 'Pranzo';
+        
         const payload = {
           dataOra: timestamp,
           nomeFamiglia: representativeName.trim(),
@@ -119,6 +126,7 @@ export default function RsvpModal({ isOpen, onClose, rsvpData, coupleData }) {
           partecipazione: attendanceText,
           intolleranzeNote: dietaryFormatted,
           noteAggiuntive: cleanNotes,
+          targetSheet: targetSheet,
         };
 
         await fetch(sheetsEndpoint.trim(), {

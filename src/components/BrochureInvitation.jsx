@@ -12,7 +12,7 @@ import {
 import EmbossedFloralHeart from './EmbossedFloralHeart';
 import Countdown from './Countdown';
 import RsvpModal from './RsvpModal';
-import { invitationData } from '../data/invitationData';
+import { getInvitationData } from '../data/invitationData';
 
 export default function BrochureInvitation() {
   // step: 0 = Chiuso (Unico quadrato perfetto con Copertina e Cuore)
@@ -21,7 +21,7 @@ export default function BrochureInvitation() {
   const [step, setStep] = useState(0);
   const [isRsvpOpen, setIsRsvpOpen] = useState(false);
 
-  const { couple, event, quote } = invitationData;
+  const { couple, event, quote } = getInvitationData();
 
   const handleNextStep = () => {
     if (step === 0) {
@@ -241,9 +241,10 @@ export default function BrochureInvitation() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <div className="center-header-intro">
-                      {event.anniversaryHeading}
-                    </div>
+                    <div
+                      className="center-header-intro"
+                      dangerouslySetInnerHTML={{ __html: event.anniversaryHeading }}
+                    />
 
                     <div className="center-date-highlight">
                       <span className="event-date-main">{event.formattedDate} - {event.ceremonyTime}</span>
@@ -292,6 +293,16 @@ export default function BrochureInvitation() {
                     <p className="reception-venue-address">
                       {event.reception.address}
                     </p>
+
+                    <p className="reception-venue-address">
+                      {event.reception.city}
+                    </p>
+
+                    {/*{event.reception.details && (
+                      <p className="reception-venue-details">
+                        {event.reception.details}
+                      </p>
+                    )}*/}
 
                     <div className="reception-actions">
                       <a
@@ -358,6 +369,7 @@ export default function BrochureInvitation() {
         onClose={() => setIsRsvpOpen(false)}
         rsvpData={event.rsvp}
         coupleData={couple}
+        eventData={event}
       />
     </div>
   );

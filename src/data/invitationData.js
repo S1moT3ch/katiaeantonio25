@@ -20,7 +20,7 @@ export const invitationData = {
     // Data dei 25 anni di matrimonio
     dateIso: "2026-09-26T11:30:00",
     formattedDate: "Sabato 26 Settembre 2026",
-    anniversaryHeading: "Con Simone e Andrea, insieme a voi,\n ringrazieremo il Signore per averci benignamente assistito in questi\n25 anni di Matrimonio",
+    anniversaryHeading: "... dopo <b>25 anni</b>\nCon Simone e Andrea, insieme a voi,\n ringrazieremo il Signore\nper tutti i benifici che ci ha concesso \nin questo tempo di grazia",
     ceremonyTime: "Ore 11:30",
     receptionTime: "A seguire",
 
@@ -42,6 +42,16 @@ export const invitationData = {
       mapsUrl: "https://www.google.com/maps/search/?api=1&query=Masseria+Foggiagrande+Putignano",
     },
 
+    receptionEvening: {
+      title: "La Festa Serale",
+      introText: "Abbiamo un desiderio: tarscorrere del tempo speciale con\ngli amici che c'erano allora, ci sono stati sempre e, confidiamo,\ncontinueranno ad esserci.\nPensiamo ad un momento informale, da vivere tra noi, nella più calda semplicità.\nVorremmo incontrarci come se dovessimo mangiare focaccia e mortadella in spiaggia.\nVi proponiamo un appuntamento",
+      placeName: "Sabato 26 Settembre",
+      address: "ore 20.00",
+      city: "Monopoli",
+      mapsUrl: "https://maps.app.goo.gl/yJ9RwYSPzy4HkAak6",
+      details: "Lido Colonia - Contrada Porto Camicia, 29/C",
+    },
+
     rsvp: {
       noticeText: "È gradito un cenno di partecipazione",
       phone1: "3932665321",
@@ -54,4 +64,25 @@ export const invitationData = {
       googleSheetsScriptUrl: "https://script.google.com/macros/s/AKfycbzz53AX8IDLV1G8TIREHiZbFgevAND-H7AjnlG76mE3oC7XeM47x8rND0U5viCRGqtbxQ/exec",
     }
   }
+};
+
+export const getInvitationData = () => {
+  // Check URL parameters
+  const params = new URLSearchParams(window.location.search);
+  const isEvening = params.get('f') === '2';
+
+  // Create a deep copy of the base invitation data
+  const data = JSON.parse(JSON.stringify(invitationData));
+
+  if (isEvening) {
+    // Replace standard reception with evening reception
+    data.event.reception = data.event.receptionEvening;
+    // Optional: override time if ceremonyTime/receptionTime needs to change for evening guests
+    data.event.receptionTime = "Ore 20:00";
+    data.event.partyType = "Sera";
+  } else {
+    data.event.partyType = "Pranzo";
+  }
+
+  return data;
 };

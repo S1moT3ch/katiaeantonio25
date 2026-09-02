@@ -62,7 +62,8 @@ def generate_random_record():
         "numeroOspiti": ospiti,
         "partecipazione": partecipazione,
         "intolleranzeNote": intolleranze,
-        "noteAggiuntive": random.choice(NOTE_POOL)
+        "noteAggiuntive": random.choice(NOTE_POOL),
+        "targetSheet": random.choice(["Pranzo", "Sera Monopoli"]),
     }
 
 def normalizza_categoria(voce):
