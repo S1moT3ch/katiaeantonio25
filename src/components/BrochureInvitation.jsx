@@ -247,9 +247,9 @@ export default function BrochureInvitation() {
                     />
 
                     <div className="center-date-highlight">
-                      <span className="event-date-main">{event.formattedDate} - {event.ceremonyTime}</span>
+                      <span className="event-date-main">{event.formattedDate}<br />{event.ceremonyTime}</span>
                       <span className="event-church-title">{event.ceremony.placeName}</span>
-                      <span className="event-church-city">{event.ceremony.city}</span>
+                      {/*<span className="event-church-city">{event.ceremony.city}</span>*/}
                     </div>
 
                     <div className="center-couple-names-block">
@@ -282,65 +282,57 @@ export default function BrochureInvitation() {
                   <div className="square-leaf-surface bottom-leaf-surface leaf-bottom-rounded">
                     <div className="crease-divider top-divider"></div>
 
-                    <div className="reception-intro-text">
-                      {event.reception.introText}
-                    </div>
+                    {event.reception ? (
+                      <>
+                        <div className="reception-intro-text">
+                          {event.reception.introText}
+                        </div>
 
-                    <div className="reception-venue-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                      <h3 className="reception-venue-title">
-                        {event.reception.placeName}
-                      </h3>
+                        <div className="reception-venue-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                          <h3 className="reception-venue-title">
+                            {event.reception.placeName}
+                          </h3>
 
-                      <p className="reception-venue-address">
-                        {event.reception.address}
-                      </p>
+                          <p className="reception-venue-address">
+                            {event.reception.address}
+                          </p>
 
-                      <p className="reception-venue-address">
-                        {event.reception.city}
-                      </p>
-                    </div>
+                          <p className="reception-venue-address">
+                            {event.reception.city}
+                          </p>
+                        </div>
 
-                    {/*{event.reception.details && (
-                      <p className="reception-venue-details">
-                        {event.reception.details}
-                      </p>
-                    )}*/}
+                        <div className="reception-actions">
+                          <a
+                            href={event.reception.mapsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-navy-link"
+                          >
+                            <MapPin size={14} />
+                            <span>Indicazioni Mappa</span>
+                          </a>
+                        </div>
 
-                    <div className="reception-actions">
-                      <a
-                        href={event.reception.mapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-navy-link"
-                      >
-                        <MapPin size={14} />
-                        <span>Indicazioni Mappa</span>
-                      </a>
-                    </div>
-
-                    {/*<div className="rsvp-divider-line"></div>*/}
-
-                    <div className="rsvp-section-box">
-                      {/*<div className="rsvp-phones-row">
-                        <a href={`tel:${event.rsvp.phone1}`} className="phone-chip">
-                          <Phone size={12} />
-                          <span>{event.rsvp.phoneFormatted1}</span>
-                        </a>
-                        <a href={`tel:${event.rsvp.phone2}`} className="phone-chip">
-                          <Phone size={12} />
-                          <span>{event.rsvp.phoneFormatted2}</span>
-                        </a>
-                      </div>*/}
-
-                      <button
-                        type="button"
-                        className="btn-rsvp-primary"
-                        onClick={() => setIsRsvpOpen(true)}
-                      >
-                        <Send size={15} />
-                        <span>Conferma Presenza (RSVP)</span>
-                      </button>
-                    </div>
+                        <div className="rsvp-section-box">
+                          <button
+                            type="button"
+                            className="btn-rsvp-primary"
+                            onClick={() => setIsRsvpOpen(true)}
+                          >
+                            <Send size={15} />
+                            <span>Conferma Presenza (RSVP)</span>
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="ceremony-only-bottom" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '1rem', gap: '2rem' }}>
+                        <p className="reception-intro-text" style={{ fontSize: '1.2rem', fontStyle: 'italic', lineHeight: '1.6' }}>
+                          Saremmo felici di condividere<br />con voi la gioia<br />di questo momento.
+                        </p>
+                        <EmbossedFloralHeart scale={0.7} />
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}

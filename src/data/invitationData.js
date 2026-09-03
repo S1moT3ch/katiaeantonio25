@@ -18,10 +18,10 @@ export const invitationData = {
 
   event: {
     // Data dei 25 anni di matrimonio
-    dateIso: "2026-09-26T11:30:00",
+    dateIso: "2026-09-26T11:00:00",
     formattedDate: "Sabato 26 Settembre 2026",
     anniversaryHeading: "... dopo <b>25 anni</b>\nCon Simone e Andrea, insieme a voi,\n ringrazieremo il Signore\nper tutti i benefici che ci ha concesso \nin questo tempo",
-    ceremonyTime: "Ore 11:30",
+    ceremonyTime: "Ore 11:00",
     receptionTime: "A seguire",
 
     ceremony: {
@@ -30,7 +30,7 @@ export const invitationData = {
       city: "Gioia del Colle (BA)",
       address: "Gioia del Colle",
       mapsUrl: "https://www.google.com/maps/search/?api=1&query=Chiesa+Immacolata+di+Lourdes+Gioia+del+Colle",
-      time: "ore 10.30"
+      time: "ore 11.00"
     },
 
     reception: {
@@ -44,7 +44,7 @@ export const invitationData = {
 
     receptionEvening: {
       title: "La Festa Serale",
-      introText: "Desideriamo trascorrere del tempo speciale con\ngli amici che c'erano allora, ci sono stati sempre e, confidiamo,\ncontinueranno ad esserci.\nPensiamo ad un momento informale, da vivere tra noi,\nin semplicità con amicizia",
+      introText: "Desideriamo trascorrere del tempo speciale\ncon gli amici che c'erano allora, ci sono stati sempre e, confidiamo,\ncontinueranno ad esserci.\nPensiamo ad un momento informale, da vivere tra noi,\nin semplicità con amicizia",
       placeName: "Sabato 26 Settembre",
       address: "ore 20.00",
       city: "Monopoli",
@@ -58,7 +58,7 @@ export const invitationData = {
       phone2: "3346670222",
       phoneFormatted1: "393 2665321",
       phoneFormatted2: "334 6670222",
-      whatsappNumber: "393395343851",
+      whatsappNumber: "393346670222",
       deadline: "10 Settembre 2026",
       // Incolla qui l'URL dell'App Web di Google Apps Script (creato seguendo la guida)
       googleSheetsScriptUrl: "https://script.google.com/macros/s/AKfycbzz53AX8IDLV1G8TIREHiZbFgevAND-H7AjnlG76mE3oC7XeM47x8rND0U5viCRGqtbxQ/exec",
@@ -70,11 +70,15 @@ export const getInvitationData = () => {
   // Check URL parameters
   const params = new URLSearchParams(window.location.search);
   const isEvening = params.get('f') === '2';
+  const isCeremonyOnly = params.get('f') === '3';
 
   // Create a deep copy of the base invitation data
   const data = JSON.parse(JSON.stringify(invitationData));
 
-  if (isEvening) {
+  if (isCeremonyOnly) {
+    data.event.reception = null;
+    data.event.partyType = "Solo Cerimonia";
+  } else if (isEvening) {
     // Replace standard reception with evening reception
     data.event.reception = data.event.receptionEvening;
     // Optional: override time if ceremonyTime/receptionTime needs to change for evening guests

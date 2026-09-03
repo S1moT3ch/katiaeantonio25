@@ -73,11 +73,7 @@ body {
 }
 
 body {
-  background-image:
-    radial-gradient(rgba(180, 170, 155, 0.3) 1px, transparent 1px),
-    radial-gradient(rgba(200, 190, 175, 0.1) 1px, #EDE8DD 1px);
-  background-size: 24px 24px;
-  background-position: 0 0, 12px 12px;
+  /* Pattern a pallini rimosso */
 }
 
 /* ==========================================================================
@@ -723,7 +719,7 @@ body {
   width: 75%;
   background: #ffffff;
   padding: 0.6rem 0.6rem 2.2rem 0.6rem;
-  box-shadow: 0 4px 15px rgba(20, 32, 54, 0.15), inset 0 0 0 1px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(20, 32, 54, 0.15), inset 0 0 0 1px rgba(0, 0, 0, 0.05);
   transform: rotate(-3deg);
   position: relative;
 }
@@ -737,8 +733,8 @@ body {
   width: 60px;
   height: 25px;
   background: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(2px);
   z-index: 10;
 }
@@ -776,22 +772,22 @@ body {
 
 /* 3. ANTA INFERIORE (BOTTOM LEAF) */
 .bottom-leaf-surface {
-  padding: 1.4rem 1.2rem;
+  padding: 0.8rem 1.2rem;
   text-align: center;
   background: linear-gradient(180deg, var(--cream-paper-light) 0%, #F5EFE2 100%);
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  gap: 0.6rem;
+  gap: 0.3rem;
   border-top: 1px solid var(--cream-border);
 }
 
 .reception-intro-text {
   font-family: var(--font-invitation);
-  font-size: 0.98rem;
+  font-size: 0.9rem;
   font-weight: 400;
   color: var(--ink-navy);
-  line-height: 1.4;
+  line-height: 1.35;
   white-space: pre-wrap;
 }
 
@@ -909,16 +905,18 @@ body {
 }
 
 @keyframes iconPulse {
-  0% { 
-    transform: scale(1); 
+  0% {
+    transform: scale(1);
     filter: drop-shadow(0 0 0 rgba(20, 32, 54, 0));
   }
-  50% { 
-    transform: scale(1.35) translateY(-2px); 
+
+  50% {
+    transform: scale(1.35) translateY(-2px);
     filter: drop-shadow(0 4px 6px rgba(20, 32, 54, 0.4));
   }
-  100% { 
-    transform: scale(1); 
+
+  100% {
+    transform: scale(1);
     filter: drop-shadow(0 0 0 rgba(20, 32, 54, 0));
   }
 }
