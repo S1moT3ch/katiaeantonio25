@@ -70,6 +70,7 @@ body {
   overflow: hidden;
   position: fixed;
   inset: 0;
+  touch-action: pan-x pan-y;
 }
 
 body {
@@ -91,8 +92,13 @@ body {
 }
 
 .brochure-page-container.is-zoomed-in {
-  padding-top: clamp(430px, 110vw, 500px);
-  padding-bottom: clamp(430px, 110vw, 500px);
+  padding-top: 100vh;
+  padding-bottom: 200vh;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .ambient-background-glow {
@@ -106,6 +112,69 @@ body {
   background: radial-gradient(circle, rgba(255, 255, 255, 0.85) 0%, rgba(245, 240, 230, 0.3) 50%, transparent 80%);
   pointer-events: none;
   z-index: 0;
+}
+
+.zoom-controls-wrapper {
+  position: fixed;
+  bottom: 8rem;
+  right: 1.5rem;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.zoom-toggle-button {
+  background: var(--navy-bg);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.zoom-toggle-button:active {
+  transform: scale(0.9);
+}
+
+.zoom-tooltip {
+  color: var(--navy-bg);
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border: 1.5px solid var(--navy-bg);
+  border-radius: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: floatTooltip 2s infinite ease-in-out;
+  position: relative;
+}
+
+.zoom-tooltip::after {
+  content: '';
+  position: absolute;
+  right: -6.5px;
+  top: 50%;
+  margin-top: -6px;
+  width: 12px;
+  height: 12px;
+  border-top: 1.5px solid var(--navy-bg);
+  border-right: 1.5px solid var(--navy-bg);
+  transform: rotate(45deg);
+  background: #EDE8DD;
+}
+
+@keyframes floatTooltip {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-5px); }
 }
 
 /* ==========================================================================
@@ -1047,7 +1116,7 @@ body {
    ========================================================================== */
 .bottom-nav-controls {
   position: fixed;
-  bottom: 1.5rem;
+  bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 80;

@@ -7,7 +7,9 @@ import {
   RotateCcw,
   ChevronUp,
   ChevronDown,
-  Phone
+  Phone,
+  ZoomIn,
+  ZoomOut
 } from 'lucide-react';
 import EmbossedFloralHeart from './EmbossedFloralHeart';
 import Countdown from './Countdown';
@@ -56,7 +58,7 @@ export default function BrochureInvitation() {
     if (touchStartY === null) return;
 
     // Ignoriamo lo swipe se siamo zoomati
-    if (window.visualViewport && window.visualViewport.scale > 1.05) {
+    if (zoomLevel > 0 || (window.visualViewport && window.visualViewport.scale > 1.05)) {
       setTouchStartY(null);
       return;
     }
@@ -74,7 +76,47 @@ export default function BrochureInvitation() {
   };
 
   const cardRef = useRef(null);
+  const containerRef = useRef(null);
   const [autoScaleFactor, setAutoScaleFactor] = useState(1);
+  const [zoomScaleFactor, setZoomScaleFactor] = useState(1);
+  const [zoomLevel, setZoomLevel] = useState(0); // 0: Normal, 1: Fit Width, 2: Max Zoom
+  const [hasZoomed, setHasZoomed] = useState(false);
+
+  const handleZoomToggle = () => {
+    const newLevel = (zoomLevel + 1) % 3;
+    setZoomLevel(newLevel);
+    if (!hasZoomed) setHasZoomed(true);
+
+    if (newLevel === 1) {
+      setTimeout(() => {
+        if (containerRef.current && cardRef.current) {
+          const container = containerRef.current;
+          const card = cardRef.current;
+          
+          const paddingTop = container.clientHeight; // 100vh
+          const cardHeight = card.offsetHeight;
+          
+          // Calcoliamo la scala a cui stiamo per arrivare
+          let scale = autoScaleFactor;
+          if (newLevel === 1) scale = zoomScaleFactor;
+          if (newLevel === 2) scale = zoomScaleFactor * 1.5;
+          
+          const centerY = paddingTop + cardHeight / 2;
+          const distanceToTop = (cardHeight * 1.5) * scale;
+          const targetY = centerY - distanceToTop - 40; // 40px margin
+
+          container.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+        }
+      }, 600);
+    }
+  };
+
+  const getCurrentScale = () => {
+    if (zoomLevel === 0) return autoScaleFactor;
+    if (zoomLevel === 1) return zoomScaleFactor;
+    if (zoomLevel === 2) return zoomScaleFactor * 1.5;
+    return autoScaleFactor;
+  };
 
   // Effetto cinematografico: Zoom-out dinamico per far entrare tutto nello schermo
   useEffect(() => {
@@ -86,13 +128,10 @@ export default function BrochureInvitation() {
       if (baseHeight === 0 || baseWidth === 0) return;
 
       // Calcoliamo l'altezza e la larghezza totale stimata in base allo step
-      // Aggiungiamo un margine per respiro (es. 10% in altezza, un po' di padding per la larghezza)
       let requiredHeight = baseHeight * 1.1;
       if (step >= 1) {
         requiredHeight = baseHeight * 3.3;
       }
-      // La larghezza richiesta è esattamente la larghezza del piatto blu,
-      // che essendo in rapporto 16/11 rispetto al quadrato bianco, è 1.454545 volte il baseWidth.
       const requiredWidth = baseWidth * 1.454545;
 
       const availableHeight = window.innerHeight;
@@ -101,9 +140,7 @@ export default function BrochureInvitation() {
       let scaleH = 1;
       let scaleW = 1;
 
-      // Su schermi piccoli, forziamo il ridimensionamento per far entrare TUTTO il piatto blu nella larghezza.
       if (requiredWidth > availableWidth) {
-        // Aggiungiamo un piccolissimo margine (es. diviso per 1.05) per non incollarlo ai bordi del telefono
         scaleW = availableWidth / (requiredWidth * 1.05);
       }
 
@@ -111,12 +148,15 @@ export default function BrochureInvitation() {
         scaleH = availableHeight / requiredHeight;
       }
 
-      // Imposta il minor scale (quello più restrittivo)
+      // autoScaleFactor adatta l'invito per farlo entrare TUTTO (sia larghezza che altezza del piatto blu)
       setAutoScaleFactor(Math.min(scaleH, scaleW, 1));
+      
+      // zoomScaleFactor fa in modo che i FOGLI (baseWidth) riempiano la larghezza dello schermo
+      const sheetFitScale = availableWidth / (baseWidth * 1.02); 
+      setZoomScaleFactor(Math.min(sheetFitScale, 2));
     };
 
     updateScale();
-    // Piccolo ritardo per assicurare il rendering del DOM
     const timeout = setTimeout(updateScale, 50);
 
     window.addEventListener('resize', updateScale);
@@ -132,9 +172,17 @@ export default function BrochureInvitation() {
     ease: [0.22, 1, 0.36, 1]
   };
 
+  const dragProps = zoomLevel === 2 ? {
+    drag: true,
+    dragConstraints: { top: -1200, bottom: 1200, left: -600, right: 600 },
+    dragMomentum: false,
+    dragElastic: 0.1
+  } : {};
+
   return (
     <div
-      className="brochure-page-container"
+      ref={containerRef}
+      className={`brochure-page-container ${zoomLevel > 0 ? 'is-zoomed-in' : ''}`}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
@@ -150,8 +198,17 @@ export default function BrochureInvitation() {
           <motion.div
             ref={cardRef}
             className="clean-folding-card"
-            animate={{ scale: autoScaleFactor }}
+            style={{ 
+              transformOrigin: 'center center',
+              touchAction: zoomLevel === 2 ? 'none' : 'auto'
+            }}
+            animate={{ 
+              scale: getCurrentScale(),
+              x: zoomLevel === 2 ? null : 0,
+              y: zoomLevel === 2 ? null : 0
+            }}
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+            {...dragProps}
           >
 
             {/* 1. QUADRATO SUPERIORE (VISIBILE IN STEP 1 & 2) */}
@@ -342,8 +399,28 @@ export default function BrochureInvitation() {
         </motion.div>
       </main>
 
+      {/* Pulsante Zoom (visibile da step 1 in poi) */}
+      {/* Pulsante Zoom (visibile da step 1 in poi) */}
+      {step >= 1 && (
+        <div className="zoom-controls-wrapper">
+          {!hasZoomed && step === 1 && zoomLevel === 0 && (
+            <div className="zoom-tooltip">
+              Usa questo tasto per ingrandire
+            </div>
+          )}
+          <button
+            type="button"
+            className="zoom-toggle-button"
+            onClick={handleZoomToggle}
+            title="Cambia livello di Zoom"
+          >
+            {zoomLevel === 2 ? <ZoomOut size={24} /> : <ZoomIn size={24} />}
+          </button>
+        </div>
+      )}
+
       {/* Pulsanti di Navigazione in Basso (visibili solo durante l'apertura) */}
-      {step === 1 && (
+      {step === 1 && zoomLevel === 0 && (
         <footer className="bottom-nav-controls">
           <div className="step-buttons-group">
             <button type="button" className="btn-action-secondary" onClick={handlePrevStep}>
