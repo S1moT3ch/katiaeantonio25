@@ -107,13 +107,13 @@ export default function BrochureInvitation() {
       const scale = zoomScaleFactor;
       const polaroidTopLocal = (cardHeight / 2 + cardWidth) * scale;
       const cardNativeCenterY = screenHeight / 2 - 32;
-      const targetY = polaroidTopLocal - cardNativeCenterY + 40; 
+      const targetY = polaroidTopLocal - cardNativeCenterY + 40;
 
-      controls.start({ 
-        scale: scale, 
-        x: 0, 
-        y: targetY, 
-        transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] } 
+      controls.start({
+        scale: scale,
+        x: 0,
+        y: targetY,
+        transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] }
       });
 
       const maxY = targetY;
@@ -122,21 +122,21 @@ export default function BrochureInvitation() {
       const scaledWidth = cardWidth * scale;
       const maxX = Math.max(0, (scaledWidth - screenWidth) / 2 + 40);
       const minX = -maxX;
-      
+
       setDragLimits({ top: Math.min(minY, maxY), bottom: Math.max(minY, maxY), left: minX, right: maxX });
-      
+
     } else if (zoomLevel === 0) {
-      controls.start({ 
-        scale: autoScaleFactor, 
-        x: 0, 
-        y: 0, 
-        transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] } 
+      controls.start({
+        scale: autoScaleFactor,
+        x: 0,
+        y: 0,
+        transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] }
       });
     } else if (zoomLevel === 2) {
       const scale = zoomScaleFactor * 1.5;
-      controls.start({ 
-        scale: scale, 
-        transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] } 
+      controls.start({
+        scale: scale,
+        transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] }
       });
 
       const distanceToTopLocal = cardHeight / 2 + cardWidth;
@@ -147,7 +147,7 @@ export default function BrochureInvitation() {
       const scaledWidth = cardWidth * scale;
       const maxX = Math.max(0, (scaledWidth - screenWidth) / 2 + 40);
       const minX = -maxX;
-      
+
       setDragLimits({ top: Math.min(minY, maxY), bottom: Math.max(minY, maxY), left: minX, right: maxX });
     }
   }, [zoomLevel, autoScaleFactor, zoomScaleFactor, controls]);
@@ -191,9 +191,9 @@ export default function BrochureInvitation() {
 
       // autoScaleFactor adatta l'invito per farlo entrare TUTTO (sia larghezza che altezza del piatto blu)
       setAutoScaleFactor(Math.min(scaleH, scaleW, 1));
-      
+
       // zoomScaleFactor fa in modo che i FOGLI (baseWidth) riempiano la larghezza dello schermo
-      const sheetFitScale = availableWidth / (baseWidth * 1.02); 
+      const sheetFitScale = availableWidth / (baseWidth * 1.02);
       setZoomScaleFactor(Math.min(sheetFitScale, 2));
     };
 
@@ -248,7 +248,7 @@ export default function BrochureInvitation() {
           <motion.div
             ref={cardRef}
             className="clean-folding-card"
-            style={{ 
+            style={{
               transformOrigin: 'center center',
               touchAction: zoomLevel > 0 ? 'none' : 'auto'
             }}
@@ -462,7 +462,7 @@ export default function BrochureInvitation() {
           )}
           {step === 2 && zoomLevel === 1 && (
             <div className="zoom-tooltip">
-              Clicca ancora per ingrandire di più
+              Clicca per ingrandire di più
             </div>
           )}
           <button
