@@ -100,13 +100,13 @@ export default function RsvpModal({ isOpen, onClose, rsvpData, coupleData, event
 
     setIsSubmitting(true);
 
-    let attendanceText = 'Saremo presenti a Cerimonia e Ricevimento';
+    let attendanceText = 'Saremo presenti';
     if (attendance === 'ceremony') attendanceText = 'Solo Celebrazione';
     if (attendance === 'cannot') attendanceText = 'Purtroppo non potremo esserci';
-    
+
     // Aggiungo il tipo di evento per differenziare Pranzo/Sera
     if (attendance !== 'cannot' && eventData?.partyType) {
-      attendanceText += ` (${eventData.partyType})`;
+      attendanceText += ``;
     }
 
     const timestamp = new Date().toLocaleString('it-IT', { timeZone: 'Europe/Rome' });
@@ -118,7 +118,7 @@ export default function RsvpModal({ isOpen, onClose, rsvpData, coupleData, event
     if (sheetsEndpoint && sheetsEndpoint.trim().length > 0) {
       try {
         const targetSheet = eventData?.partyType === 'Sera' ? 'Sera Monopoli' : 'Pranzo';
-        
+
         const payload = {
           dataOra: timestamp,
           nomeFamiglia: representativeName.trim(),
@@ -271,7 +271,7 @@ export default function RsvpModal({ isOpen, onClose, rsvpData, coupleData, event
           </div>
 
           {/* SEZIONE INTOLLERANZE CON NUMERO DI PERSONE DEDICATO */}
-          {attendance !== 'cannot' && (
+          {attendance !== 'cannot' && eventData?.partyType !== 'Sera' && (
             <div className="form-group dietary-section-box">
               <label className="dietary-main-label">
                 <Utensils size={16} className="input-label-icon" /> Intolleranze, allergie o richieste alimentari
