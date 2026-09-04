@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import {
   Heart,
   MapPin,
@@ -77,39 +77,80 @@ export default function BrochureInvitation() {
 
   const cardRef = useRef(null);
   const containerRef = useRef(null);
+  const controls = useAnimation();
   const [autoScaleFactor, setAutoScaleFactor] = useState(1);
   const [zoomScaleFactor, setZoomScaleFactor] = useState(1);
   const [zoomLevel, setZoomLevel] = useState(0); // 0: Normal, 1: Fit Width, 2: Max Zoom
   const [hasZoomed, setHasZoomed] = useState(false);
+  const [dragLimits, setDragLimits] = useState({ top: 0, bottom: 0, left: 0, right: 0 });
 
   const handleZoomToggle = () => {
-    const newLevel = (zoomLevel + 1) % 3;
+    let newLevel;
+    if (step === 1) {
+      newLevel = zoomLevel === 0 ? 1 : 0;
+    } else {
+      newLevel = (zoomLevel + 1) % 3;
+    }
     setZoomLevel(newLevel);
     if (!hasZoomed) setHasZoomed(true);
-
-    if (newLevel === 1) {
-      setTimeout(() => {
-        if (containerRef.current && cardRef.current) {
-          const container = containerRef.current;
-          const card = cardRef.current;
-          
-          const paddingTop = container.clientHeight; // 100vh
-          const cardHeight = card.offsetHeight;
-          
-          // Calcoliamo la scala a cui stiamo per arrivare
-          let scale = autoScaleFactor;
-          if (newLevel === 1) scale = zoomScaleFactor;
-          if (newLevel === 2) scale = zoomScaleFactor * 1.5;
-          
-          const centerY = paddingTop + cardHeight / 2;
-          const distanceToTop = (cardHeight * 1.5) * scale;
-          const targetY = centerY - distanceToTop - 40; // 40px margin
-
-          container.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
-        }
-      }, 600);
-    }
   };
+
+  useEffect(() => {
+    if (!cardRef.current) return;
+    const card = cardRef.current;
+    const cardHeight = card.offsetHeight;
+    const cardWidth = card.offsetWidth;
+    const screenHeight = window.innerHeight;
+    const screenWidth = window.innerWidth;
+
+    if (zoomLevel === 1) {
+      const scale = zoomScaleFactor;
+      const polaroidTopLocal = (cardHeight / 2 + cardWidth) * scale;
+      const cardNativeCenterY = screenHeight / 2 - 32;
+      const targetY = polaroidTopLocal - cardNativeCenterY + 40; 
+
+      controls.start({ 
+        scale: scale, 
+        x: 0, 
+        y: targetY, 
+        transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] } 
+      });
+
+      const maxY = targetY;
+      const distanceToBottomLocal = cardHeight / 2 + cardWidth;
+      const minY = screenHeight - 40 - cardNativeCenterY - distanceToBottomLocal * scale;
+      const scaledWidth = cardWidth * scale;
+      const maxX = Math.max(0, (scaledWidth - screenWidth) / 2 + 40);
+      const minX = -maxX;
+      
+      setDragLimits({ top: Math.min(minY, maxY), bottom: Math.max(minY, maxY), left: minX, right: maxX });
+      
+    } else if (zoomLevel === 0) {
+      controls.start({ 
+        scale: autoScaleFactor, 
+        x: 0, 
+        y: 0, 
+        transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] } 
+      });
+    } else if (zoomLevel === 2) {
+      const scale = zoomScaleFactor * 1.5;
+      controls.start({ 
+        scale: scale, 
+        transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] } 
+      });
+
+      const distanceToTopLocal = cardHeight / 2 + cardWidth;
+      const distanceToBottomLocal = cardHeight / 2 + cardWidth;
+      const cardNativeCenterY = screenHeight / 2 - 32;
+      const maxY = distanceToTopLocal * scale - cardNativeCenterY + 40;
+      const minY = screenHeight - 40 - cardNativeCenterY - distanceToBottomLocal * scale;
+      const scaledWidth = cardWidth * scale;
+      const maxX = Math.max(0, (scaledWidth - screenWidth) / 2 + 40);
+      const minX = -maxX;
+      
+      setDragLimits({ top: Math.min(minY, maxY), bottom: Math.max(minY, maxY), left: minX, right: maxX });
+    }
+  }, [zoomLevel, autoScaleFactor, zoomScaleFactor, controls]);
 
   const getCurrentScale = () => {
     if (zoomLevel === 0) return autoScaleFactor;
@@ -172,17 +213,26 @@ export default function BrochureInvitation() {
     ease: [0.22, 1, 0.36, 1]
   };
 
-  const dragProps = zoomLevel === 2 ? {
-    drag: true,
-    dragConstraints: { top: -1200, bottom: 1200, left: -600, right: 600 },
-    dragMomentum: false,
-    dragElastic: 0.1
-  } : {};
+  let dragProps = {};
+  if (zoomLevel === 1) {
+    dragProps = {
+      drag: "y",
+      dragConstraints: dragLimits,
+      dragMomentum: true
+    };
+  } else if (zoomLevel === 2) {
+    dragProps = {
+      drag: true,
+      dragConstraints: dragLimits,
+      dragMomentum: false,
+      dragElastic: 0.1
+    };
+  }
 
   return (
     <div
       ref={containerRef}
-      className={`brochure-page-container ${zoomLevel > 0 ? 'is-zoomed-in' : ''}`}
+      className="brochure-page-container"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
@@ -200,14 +250,9 @@ export default function BrochureInvitation() {
             className="clean-folding-card"
             style={{ 
               transformOrigin: 'center center',
-              touchAction: zoomLevel === 2 ? 'none' : 'auto'
+              touchAction: zoomLevel > 0 ? 'none' : 'auto'
             }}
-            animate={{ 
-              scale: getCurrentScale(),
-              x: zoomLevel === 2 ? null : 0,
-              y: zoomLevel === 2 ? null : 0
-            }}
-            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+            animate={controls}
             {...dragProps}
           >
 
@@ -276,7 +321,9 @@ export default function BrochureInvitation() {
                   <motion.div
                     key="step-1-seneca"
                     className="leaf-view seneca-leaf-view"
-                    onClick={handleNextStep}
+                    onClick={() => {
+                      if (zoomLevel === 0) handleNextStep();
+                    }}
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
@@ -403,9 +450,19 @@ export default function BrochureInvitation() {
       {/* Pulsante Zoom (visibile da step 1 in poi) */}
       {step >= 1 && (
         <div className="zoom-controls-wrapper">
-          {!hasZoomed && step === 1 && zoomLevel === 0 && (
+          {!hasZoomed && zoomLevel === 0 && (
             <div className="zoom-tooltip">
               Usa questo tasto per ingrandire
+            </div>
+          )}
+          {step === 1 && zoomLevel === 1 && (
+            <div className="zoom-tooltip">
+              Clicca per rimpicciolire e continuare ad aprire l'invito
+            </div>
+          )}
+          {step === 2 && zoomLevel === 1 && (
+            <div className="zoom-tooltip">
+              Clicca ancora per ingrandire di più
             </div>
           )}
           <button
@@ -414,7 +471,7 @@ export default function BrochureInvitation() {
             onClick={handleZoomToggle}
             title="Cambia livello di Zoom"
           >
-            {zoomLevel === 2 ? <ZoomOut size={24} /> : <ZoomIn size={24} />}
+            {(zoomLevel === 2 || (step === 1 && zoomLevel === 1)) ? <ZoomOut size={24} /> : <ZoomIn size={24} />}
           </button>
         </div>
       )}
